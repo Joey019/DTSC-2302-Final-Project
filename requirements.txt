@@ -22,5 +22,5 @@ seaborn>=0.13.0
 # Notebook Kernel
 ipykernel>=6.29.0
 
-pyarrow>=14.0.1
+pyarrow>=14.0.1,<20
 pandas>=2.1.0

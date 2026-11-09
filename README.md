@@ -10,11 +10,15 @@ Bash
 git clone <your-github-repo-url>
 cd DTSC-2302-Final-Project
 
-2. Create a virtual environment
+2. Create a virtual environment (Python 3.12 recommended)
 
-Windows: python -m venv .venv
+This project needs Python 3.10, 3.11, or 3.12. Python 3.13 or newer will NOT work, because our pinned numpy (<2.0) and torch (<2.5) versions don't support it, so pip install will fail.
 
-macOS / Linux: python3 -m venv .venv
+Check your version first: python3 --version (Windows: py --version). If you're on 3.13+, install 3.12 from python.org (macOS can also use: brew install python@3.12).
+
+Windows: py -3.12 -m venv .venv
+
+macOS / Linux: python3.12 -m venv .venv
 
 3. Activate the virtual environment
 
@@ -23,6 +27,10 @@ Windows: .venv\Scripts\activate
 macOS / Linux: source .venv/bin/activate
 
 4. Install project dependencies
+
+5. Select the .venv kernel in notebooks
+
+When you open a .ipynb file, click Select Kernel (top right) and choose .venv. Otherwise you'll get ModuleNotFoundError even though everything is installed.
 
 Bash
 pip install -r requirements.txt
