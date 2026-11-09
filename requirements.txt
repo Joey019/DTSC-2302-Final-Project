@@ -1,0 +1,26 @@
+# Data Processing & Pipeline
+polars>=1.0.0
+requests>=2.31.0
+tqdm>=4.66.0
+
+# Foundation & Math
+numpy<2.0.0
+
+# Machine Learning & Clustering
+scikit-learn>=1.4.0
+
+# Deep Learning & NLP
+torch>=2.2.0,<2.5.0
+transformers<4.46.0
+sentence-transformers>=3.0.0,<3.3.0
+spacy>=3.7.0
+
+# Visualization
+matplotlib>=3.8.0
+seaborn>=0.13.0
+
+# Notebook Kernel
+ipykernel>=6.29.0
+
+pyarrow>=14.0.1
+pandas>=2.1.0
