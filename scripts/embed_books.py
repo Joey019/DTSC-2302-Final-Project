@@ -42,6 +42,7 @@ OUTPUT_DIR = ROOT / "data" / "processed" / "embeddings"
 REVIEWS_PER_BOOK = 10            # at most this many reviews per book (same for every book)
 PREFERRED_MIN_WORDS = 30         # reviews between these lengths are picked first
 PREFERRED_MAX_WORDS = 300
+SKIP_UNRATED_REVIEWS = True      # skip reviews with no star rating (rating 0): often notes or progress updates
 SEED = 42                        # makes the "random" review order repeatable
 
 MODEL = "BAAI/bge-small-en-v1.5"  # 384 numbers per text; reads up to 512 tokens
@@ -58,9 +59,12 @@ def pick_reviews(reviews: pl.DataFrame) -> pl.DataFrame:
 
     Order of preference within a book:
       - reviews of PREFERRED_MIN_WORDS..PREFERRED_MAX_WORDS words come first;
-      - then rotate through the star ratings: the first review of each rating, then the
+      - then rotate through the star ratings (1-5): the first review of each rating, then the
         second of each rating, and so on (within a rating, the order is random but repeatable).
+    Reviews without a star rating (rating 0) are skipped if SKIP_UNRATED_REVIEWS is True.
     """
+    if SKIP_UNRATED_REVIEWS:
+        reviews = reviews.filter(pl.col("rating") > 0)
     reviews = reviews.with_columns(
         pl.col("word_count").is_between(PREFERRED_MIN_WORDS, PREFERRED_MAX_WORDS).alias("good_length"),
         pl.col("review_id").hash(SEED).alias("random_order"),
