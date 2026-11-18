@@ -1,48 +1,96 @@
-# Data Alliance 2.0 Final Project
-Building a predictive model to recommend novels based on past novel experiences.
+
+# DTSC-2302 Final Project: Unsupervised NLP Book Recommender
+
+Team Members: Fiorella, Johan, Ashutosh, Yoani, Hamza and Kameron
+
+## Getting Started: Local Environment Setup
+
+To ensure compatibility across Windows, macOS, and Linux, do not commit OS-specific virtual environments or massive datasets to this repository.
+
+### 1. Clone the repository
+
+```bash
+git clone https://github.com/Joey019/DTSC-2302-Final-Project.git
+cd DTSC-2302-Final-Project
+```
+
+### 2. Create a virtual environment
+
+Python 3.12 is recommended.
+
+The project supports Python 3.10, 3.11, and 3.12. Avoid Python 3.13 or newer because of compatibility with the pinned NumPy and PyTorch versions.
+
+Windows:
+
+```powershell
+py -3.12 -m venv .venv
+```
+
+macOS/Linux:
+
+```bash
+python3.12 -m venv .venv
+```
+
+### 3. Activate the virtual environment
+
+Windows:
+
+```powershell
+.venv\Scripts\activate
+```
+
+macOS/Linux:
+
+```bash
+source .venv/bin/activate
+```
+
+### 4. Install project dependencies
+
+```bash
+pip install -r requirements.txt
+```
+
+### 5. Select the virtual environment in Jupyter
+
+When opening a `.ipynb` notebook, select the `.venv` kernel to avoid missing-package errors.
+
+## ⚠️ CRITICAL: DO NOT COMMIT DATA TO GITHUB
+
+The raw dataset contains approximately 1.85 million rows.
+
+Do not commit large `.json`, `.csv`, or `.gz` datasets.
+
+The `.gitignore` is configured to exclude the `data/` directory.
+
+To download the Mystery, Thriller, and Crime dataset, run:
+
+```bash
+python scripts/fetch_data.py
+```
+
+This creates the `data/raw/` directory and downloads compressed files from the UCSD server.
+
+The Polars pipeline reads `.json.gz` files directly. Do not unzip them.
+
+---
+
 ## 📖 Plotwist — Book Recommendation Website
 
 Plotwist is an interactive book recommendation website developed using Python and Streamlit for our Goodreads Mystery, Thriller, and Crime Recommendation System project.
 
-The website allows users to explore featured books, search for a book they enjoyed, and discover similar titles.
+The website allows users to explore featured books, search for books they enjoyed, and discover similar titles.
 
 ### How to Access the Website
 
-**Step 1: Download the GitHub repository**
+First, complete the environment setup instructions above.
 
-Clone the repository using:
-
-```bash
-git clone https://github.com/Joey019/DTSC-2302-Final-Project.git
-```
-
-Alternatively, download the repository as a ZIP file from GitHub.
-
-**Step 2: Open the project folder**
-
-Navigate to the project directory:
-
-```bash
-cd DTSC-2302-Final-Project
-```
-
-**Step 3: Install Streamlit**
-
-Make sure Python is installed, then run:
-
-```bash
-python -m pip install streamlit
-```
-
-**Step 4: Launch the website**
-
-Run the following command from the project folder:
+Then launch the Streamlit application from the project folder:
 
 ```bash
 python -m streamlit run app.py
 ```
-
-**Step 5: View Plotwist**
 
 Open your browser and visit:
 
@@ -52,15 +100,21 @@ The website should open automatically when Streamlit starts.
 
 ### Website Features
 
-- Modern, dark-themed homepage with interactive book discovery
+- Modern dark navy and gold interface
 - Featured mystery, thriller, and crime books
-- Searchable book selection
-- Book recommendation cards with cover images
-- Expandable book information
-- Responsive page layout
+- Book selection and recommendation cards
+- Book covers and expandable details
+- Personal reading list with save and remove functionality
+- Shopping links to book retailers
+- Interactive buttons and hover effects
+- Save and remove notifications
+- Recommendation loading indicator
+- Welcome section and website footer
 
 ### Current Development Status
 
-The Plotwist interface is functional and currently uses sample book recommendations for testing. Integration with the group's Goodreads recommendation model is still in progress.
+The Plotwist interface currently uses sample book recommendations for testing.
+
+Integration with the group's Goodreads recommendation model is still in progress.
 
 Once integrated, the website will display recommendations generated from the team's processed book dataset.

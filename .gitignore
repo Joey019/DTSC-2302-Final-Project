@@ -1,0 +1,17 @@
+/data/raw/
+/data/processed/
+# Python Virtual Environments
+.venv/
+venv/
+env/
+
+# Python & Jupyter Cache
+__pycache__/
+.ipynb_checkpoints/
+*.pyc
+
+# macOS System Files
+.DS_Store
+
+# Environment Variables / Secrets (to protect Hugging Face tokens later)
+.env
