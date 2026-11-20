@@ -15,3 +15,6 @@ __pycache__/
 
 # Environment Variables / Secrets (to protect Hugging Face tokens later)
 .env
+
+# Personal scratch files (each teammate keeps their own locally)
+/personal/
