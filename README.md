@@ -1,27 +1,24 @@
+
 # DTSC-2302 Final Project: Unsupervised NLP Book Recommender
+
 Team Members: Fiorella, Johan, Ashutosh, Yoani, Hamza and Kameron
 
 ## Getting Started: Local Environment Setup
-To ensure compatibility across both Windows and macOS/Linux environments, do not commit OS-specific `.venv` folders or massive datasets to this repository. Follow these steps to sync your local machine.
 
-### 1. Clone the repository and navigate into it
+To ensure compatibility across Windows, macOS, and Linux, do not commit OS-specific virtual environments or massive datasets to this repository.
+
+### 1. Clone the repository
 
 ```bash
-git clone <your-github-repo-url>
+git clone https://github.com/Joey019/DTSC-2302-Final-Project.git
 cd DTSC-2302-Final-Project
 ```
 
-### 2. Create a virtual environment (Python 3.12 recommended)
+### 2. Create a virtual environment
 
-This project needs Python 3.10, 3.11, or 3.12. Python 3.13 or newer will NOT work, because our pinned numpy (<2.0) and torch (<2.5) versions don't support it, so `pip install` will fail.
+Python 3.12 is recommended.
 
-Check your version first:
-
-```bash
-python3 --version   # Windows: py --version
-```
-
-If you're on 3.13+, install 3.12 from python.org (macOS can also use `brew install python@3.12`).
+The project supports Python 3.10, 3.11, and 3.12. Avoid Python 3.13 or newer because of compatibility with the pinned NumPy and PyTorch versions.
 
 Windows:
 
@@ -29,7 +26,7 @@ Windows:
 py -3.12 -m venv .venv
 ```
 
-macOS / Linux:
+macOS/Linux:
 
 ```bash
 python3.12 -m venv .venv
@@ -43,7 +40,7 @@ Windows:
 .venv\Scripts\activate
 ```
 
-macOS / Linux:
+macOS/Linux:
 
 ```bash
 source .venv/bin/activate
@@ -55,14 +52,19 @@ source .venv/bin/activate
 pip install -r requirements.txt
 ```
 
-### 5. Select the .venv kernel in notebooks
+### 5. Select the virtual environment in Jupyter
 
-When you open a `.ipynb` file, click **Select Kernel** (top right) and choose `.venv`. Otherwise you'll get `ModuleNotFoundError` even though everything is installed.
+When opening a `.ipynb` notebook, select the `.venv` kernel to avoid missing-package errors.
 
 ## ⚠️ CRITICAL: DO NOT COMMIT DATA TO GITHUB
-The raw dataset is approximately 1.85 million rows. Committing `.json`, `.csv`, or `.gz` files will crash the repository. Our `.gitignore` is configured to block the `data/` folder.
 
-To get the exact Mystery, Thriller, and Crime subset onto your local machine, run the automated `fetch_data.py` script. This script will build the `data/raw/` folder and stream the compressed files directly from the UCSD server.
+The raw dataset contains approximately 1.85 million rows.
+
+Do not commit large `.json`, `.csv`, or `.gz` datasets.
+
+The `.gitignore` is configured to exclude the `data/` directory.
+
+To download the Mystery, Thriller, and Crime dataset, run:
 
 ```bash
 python scripts/fetch_data.py
@@ -108,3 +110,48 @@ Charts of the data and the clusters (for the poster and report) are in [`visuals
 - **Running it again overwrites** the previous output.
 - **Popularity is never used** to build the clusters: every book gets the same treatment, however many reviews or ratings it has. Popularity data (rating counts, average rating) is kept in the book table for the recommender.
 - **Already set up before the pipeline existed?** Run `pip install -r requirements.txt` again to install the new packages.
+
+---
+
+## 📖 Plotwist — Book Recommendation Website
+
+Plotwist is an interactive book recommendation website developed using Python and Streamlit for our Goodreads Mystery, Thriller, and Crime Recommendation System project.
+
+The website allows users to explore featured books, search for books they enjoyed, and discover similar titles.
+
+### How to Access the Website
+
+First, complete the environment setup instructions above.
+
+Then launch the Streamlit application from the project folder:
+
+```bash
+python -m streamlit run app.py
+```
+
+Open your browser and visit:
+
+http://localhost:8501
+
+The website should open automatically when Streamlit starts.
+
+### Website Features
+
+- Modern dark navy and gold interface
+- Featured mystery, thriller, and crime books
+- Book selection and recommendation cards
+- Book covers and expandable details
+- Personal reading list with save and remove functionality
+- Shopping links to book retailers
+- Interactive buttons and hover effects
+- Save and remove notifications
+- Recommendation loading indicator
+- Welcome section and website footer
+
+### Current Development Status
+
+The Plotwist interface currently uses sample book recommendations for testing.
+
+Integration with the group's Goodreads recommendation model is still in progress.
+
+Once integrated, the website will display recommendations generated from the team's processed book dataset.
