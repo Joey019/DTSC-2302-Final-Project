@@ -97,6 +97,8 @@ python -m spacy download en_core_web_sm
 
 Then open `notebooks/clustering.ipynb`, select the `.venv` kernel and click **Run All** (about 1 h 45 min). Results are saved to `data/processed/clustering_results/`: every book's K-Means cluster (the main model) and HDBSCAN clusters, a description of each cluster, and the scores.
 
+Charts of the data and the clusters (for the poster and report) are in [`visuals/`](visuals/README.md).
+
 **Good to know**
 
 - **It takes a while.** Step 2 can take about 6 hours on a laptop CPU (much faster with a GPU, which is used automatically). Steps 1, 3 and 4 take a few minutes each.
