@@ -10,12 +10,14 @@ Output:  data/processed/cleaned_books.parquet    one row per book, with an Engli
 What it does
   Books
     1. Load every edition of every book.
-    2. Clean the descriptions: remove HTML, quoted blurbs, and short marketing sentences.
+    2. Clean the descriptions: remove HTML, quoted blurbs, marketing sentences, author bios and
+       publishing notes (ISBN, editions, links, formats).
     3. Detect the language of each description from its text.
     4. Merge the editions of the same book (they share a "work_id") into one row.
   Reviews
     5. Load the reviews of those books (from every edition).
-    6. Clean the text: remove spoilers, HTML, links, and "free copy for an honest review" lines.
+    6. Clean the text: remove spoilers, HTML, links, typed star ratings, "free copy for an honest review"
+       lines, blog plugs and reading-challenge notes.
     7. Drop reviews that are too short.
     8. Keep only English reviews.
     9. Remove duplicates.
@@ -40,7 +42,7 @@ MIN_REVIEW_WORDS = 15        # shorter reviews are dropped
 # Editions with one of these language codes, or no code at all, get their language checked.
 # Editions with any other code (e.g. "spa", "ger") are treated as not English.
 ENGLISH_CODES = ["eng", "en-US", "en-GB", "en-CA"]
-SAMPLE_BOOKS = None          # e.g. 300 for a quick test run; None = all books
+SAMPLE_BOOKS = None          # e.g. 3000 for a quick test run; None = all books
 
 # Review sentences that contain any of these are removed (not case-sensitive).
 REVIEW_BOILERPLATE = [
@@ -61,6 +63,49 @@ DESCRIPTION_MARKETING = [
     r"from the (?:author|creator|bestselling|acclaimed|award)",
     r"million copies|copies sold|international (?:sensation|phenomenon)|published in \d+ (?:countries|languages)",
     r"(?:perfect )?for fans of|will love this|don't miss",
+]
+
+# --- Description boilerplate: publishing notes, selling talk, formats ---
+# Phrases removed wherever they appear (the sentence around them may be plot).
+DESCRIPTION_JUNK_PHRASES = [
+    r"librarian'?s note:?[^.!?]{0,120}?(?:can be found(?: here)?|isbn(?:-?1[03])?[\s:.#-]*[\dX-]{10,17}(?:\s*/\s*isbn(?:-?1[03])?[\s:.#-]*[\dX-]{10,17})?(?:,? as of \w+ \d{4})?)",
+    r"\[?(?:also see:?\s*)?alternate[- ]cover (?:edition|image)s?[^.!?\]]{0,60}?(?:isbn(?:-?1[03])?[\s:.#-]*[\dX-]{10,17}|\[ace\]|can be found(?: here)?)\]?",
+    r"\bisbn(?:-?1[03])?[\s:.#-]*[\dX-]{10,17}",
+    r"\(?\bfrom the (?:hardcover|paperback|trade paperback|mass market paperback) edition\.?\)?",
+    r"this text refers to (?:an? |the )?[\w ]{0,40}edition\.?",
+    r"https?://\S+|www\.\S+|\b[\w-]+\.(?:com|net|org|co\.uk)\b(?:/\S*)?",
+    r"\bcomplete (?:and |original and )?unabridged\b",
+    r"(?:previously|also|originally) published (?:as|under(?: the title)?) (?:[\"“][^\"”]{1,80}[\"”]|[A-Z][^,.;:]{0,60})[,.;:]?",
+    r"(?:click|tap) (?:the|on) [\"']?buy now[^.!?]{0,250}[.!?]?|read (?:it )?for free with kindle unlimited[.!]?",
+    # blurb with source in brackets:  "A thrilling read" (Nottingham Observer)
+    r"[\"“][^\"”]{5,400}[\"”]\s*\([A-Z][^)]{0,60}\)",
+]
+# Short sentences containing any of these are removed (publishing/selling talk).
+DESCRIPTION_JUNK_SENTENCES = [
+    r"\bkindle\b|\be-?book\b|digital (?:edition|format)|\bepub\b|\bmobi\b|\bavailable (?:now|in|as|for|exclusively)\b",
+    r"alternate cover|out[- ]of[- ]print|this edition (?:is|was|has been|includes editorial)",
+    r"\bunabridged\b|\babridged\b|\baudio ?book|\baudio ?cd|\b\d+\s*cds?\b|listening length|\b\d+\s*(?:hrs?|hours?)\b[^.!?]{0,15}\b(?:mins?|minutes)\b|\bnarrated by\b[^.!?]{0,40}\b(?:audio|listen)",
+    r"gutenberg|public domain|hephaestus|community of volunteers|free on the web|wireless delivery",
+    r"copyright|©|all rights reserved",
+    r"buy now|click (?:the|on|here)|pre-?order|free (?:excerpt|sample)|sign up|newsletter|mailing list|scroll up|grab (?:a|your) copy|check out these|links? to buy|search amazon|(?:on|at|from|via) amazon\b|amazon(?:'s)? (?:top|charts?|best|kindle|rankings?|highest)",
+    r"\bsave \d+%|\bbox(?:ed)? set\b",
+    r"includes (?:an? |the )?(?:exclusive |special |bonus )*(?:preview|excerpt|sneak peek|short story)|bonus (?:content|material|story|chapter)|reading group guide|discussion questions",
+    r"visit (?:his|her|their|the author'?s?) (?:website|blog|page)|follow (?:him|her|them|me) on",
+]
+ABOUT_THE_AUTHOR = r"(?is)\babout the authors?\b\s*[:-]?.*$"  # author bio section: from the heading to the end
+
+# --- Review boilerplate: typed star ratings, links, disclosures, blog plugs ---
+REVIEW_JUNK_PHRASES = [
+    # star ratings typed in the text ("3.5 stars", "I gave it 4 stars", "3/5")
+    r"\b(?:i(?:'d| would)? (?:give|rate|gave) (?:it|this(?: book| one)?) )?(?:\d(?:\.\d)?|\d ?1/2|one|two|three|four|five)(?: and a half)?\s*(?:/\s*5\s*)?(?:out of (?:5|five) )?stars?\b\.?|\b(?:my )?rating:\s*\S+(?:\s*stars?)?|\b\d(?:\.\d)?\s*/\s*(?:5|10)\b",
+    r"\b[\w-]+\.(?:blogspot|wordpress|com|net|org|ca|co\.uk|info)(?:\.\w{2,3})?\b(?:/\S*)?",  # bare web addresses
+    r"(?:read )?(?:the |my )?(?:full|complete) review (?:here|at|on|can be found(?: at| on| here)?)\s*:?|(?:originally |cross-?)posted (?:at|on|to)\s+\S+(?:\s+\S+)?|crossposted on \S+",
+]
+REVIEW_JUNK_SENTENCES = [
+    r"review (?:to come|coming soon|to follow|forthcoming|pending)|(?:full|complete|proper) review (?:to come|soon|later|to follow)|more thoughts to come|will (?:write|post) (?:a |my )?(?:full |proper )?review",
+    r"in return for (?:an? |my )?(?:honest|unbiased|fair)|under no obligation|opinions (?:expressed |above |here |in this review )*(?:are|were) (?:\d+% |entirely |completely |all )?(?:my own|mine|unbiased|honest)|book tours?\b|thanks? (?:you )?to [^.!?]{0,80} for (?:the opportunity|providing|sending|giving me (?:a|an|the|this)|(?:a|an|the|this) (?:free |review |complimentary )?copy)|compensat(?:ion|ed) for",
+    r"more (?:of my )?reviews (?:at|on my)\b|check out (?:the |my )?(?:complete |full )?review|posted (?:on|at) my|on my (?:blog|website|instagram|youtube|channel)|read rate review",
+    r"reading challenge|\b(?:group|buddy) read\b|read-?along|halloween bingo|bingo square|bingo card",
 ]
 
 # Sub-genre labels, taken from the shelves readers put a book on. Used only to EVALUATE the
@@ -122,6 +167,11 @@ def clean_review(text: pl.Expr) -> pl.Expr:
     # Sentences mentioning an "ARC" (advance copy). Upper case only, so "story arc" is kept.
     text = text.str.replace_all(r"[^.!?\n]*\be?ARCs?\b[^.!?\n]*[.!?]*", " ")
     text = text.str.replace_all(r"(?i)\bDNF(?:'?d|ed)?\b(?:\s*(?:at|@)\s*(?:page\s*)?\d+\s*%?)?", " ")  # "DNF at 30%"
+    # Star ratings, web addresses, "full review here", placeholders, disclosures, blog plugs, challenges
+    for phrase in REVIEW_JUNK_PHRASES:
+        text = text.str.replace_all("(?i)" + phrase, " ")
+    for words in REVIEW_JUNK_SENTENCES:
+        text = text.str.replace_all(r"(?i)(^|[.!?\n]\s*)[^.!?\n]{0,150}(?:" + words + r")[^.!?\n]{0,80}(?:[.!?]+|\n|$)", "${1}")
     return tidy_spaces(text)
 
 
@@ -135,6 +185,11 @@ def clean_description(text: pl.Expr) -> pl.Expr:
     short_marketing = (r"(?i)(^|[.!?\n]\s*)[^.!?\n]{0,100}(?:" + "|".join(DESCRIPTION_MARKETING)
                        + r")[^.!?\n]{0,100}(?:[.!?]+|\n|$)")
     text = text.str.replace_all(short_marketing, "${1}").str.replace_all(short_marketing, "${1}")
+    # Author bios, publishing notes (ISBN, editions, links), selling talk, formats, box sets
+    text = text.str.replace_all(ABOUT_THE_AUTHOR, " ")
+    text = text.str.replace_all("(?i)(?:" + "|".join(DESCRIPTION_JUNK_PHRASES) + ")", " ")
+    junk = r"(?i)(^|[.!?\n]\s*)[^.!?\n]{0,150}(?:" + "|".join(DESCRIPTION_JUNK_SENTENCES) + r")[^.!?\n]{0,150}(?:[.!?]+|\n|$)"
+    text = text.str.replace_all(junk, "${1}").str.replace_all(junk, "${1}")
     return tidy_spaces(text)
 
 
